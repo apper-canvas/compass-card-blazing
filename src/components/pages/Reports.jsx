@@ -40,14 +40,14 @@ function Reports() {
   if (error) return <Error message={error} onRetry={loadAnalyticsData} />;
   if (!analyticsData) return <Error message="No analytics data available" onRetry={loadAnalyticsData} />;
 
-  const {
-    conversionRate,
-    conversionTrend,
-    leadGeneration,
-    customerAcquisitionCost,
-    pipelineAnalysis,
-    revenueMetrics
-  } = analyticsData;
+const {
+    conversionRate = { current: 0, trend: 0 },
+    conversionTrend = [],
+    leadGeneration = { monthly: [], monthlyAverage: 0, trend: 0 },
+    customerAcquisitionCost = { average: 0, lowest: 0, highest: 0, trend: 0 },
+    pipelineAnalysis = { byStage: [], totalValue: 0, activeDeals: 0 },
+    revenueMetrics = { monthly: [] }
+  } = analyticsData || {};
 
   // Chart configurations
   const conversionChartOptions = {
@@ -68,8 +68,8 @@ function Reports() {
       fillOpacity: 1,
       strokeOpacity: 0.9
     },
-    xaxis: {
-      categories: conversionTrend.map(item => format(new Date(item.month), 'MMM yyyy')),
+xaxis: {
+      categories: conversionTrend?.map(item => format(new Date(item.month), 'MMM yyyy')) || [],
       labels: {
         style: {
           fontSize: '12px',
@@ -103,9 +103,9 @@ function Reports() {
     }
   };
 
-  const conversionChartSeries = [{
+const conversionChartSeries = [{
     name: 'Conversion Rate',
-    data: conversionTrend.map(item => item.rate)
+    data: conversionTrend?.map(item => item.rate) || []
   }];
 
   const leadGenChartOptions = {
@@ -116,8 +116,8 @@ function Reports() {
       fontFamily: 'Inter, system-ui, sans-serif'
     },
     colors: ['#f59e0b', '#8b5cf6'],
-    xaxis: {
-      categories: leadGeneration.monthly.map(item => format(new Date(item.month), 'MMM yyyy')),
+xaxis: {
+      categories: leadGeneration?.monthly?.map(item => format(new Date(item.month), 'MMM yyyy')) || [],
       labels: {
         style: {
           fontSize: '12px',
@@ -151,12 +151,12 @@ function Reports() {
     }
   };
 
-  const leadGenChartSeries = [{
+const leadGenChartSeries = [{
     name: 'New Leads',
-    data: leadGeneration.monthly.map(item => item.newLeads)
+    data: leadGeneration?.monthly?.map(item => item.newLeads) || []
   }, {
     name: 'Qualified Leads',
-    data: leadGeneration.monthly.map(item => item.qualifiedLeads)
+    data: leadGeneration?.monthly?.map(item => item.qualifiedLeads) || []
   }];
 
   const pipelineChartOptions = {
@@ -165,10 +165,10 @@ function Reports() {
       height: 300,
       fontFamily: 'Inter, system-ui, sans-serif'
     },
-    colors: ['#1e3a8a', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'],
-    labels: pipelineAnalysis.byStage.map(item => 
+colors: ['#1e3a8a', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'],
+    labels: pipelineAnalysis?.byStage?.map(item => 
       item.stage.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
-    ),
+    ) || [],
     legend: {
       position: 'bottom',
       fontSize: '12px',
@@ -194,9 +194,9 @@ function Reports() {
         formatter: (value) => `$${value.toLocaleString()}`
       }
     }
-  };
+};
 
-  const pipelineChartSeries = pipelineAnalysis.byStage.map(item => item.value);
+  const pipelineChartSeries = pipelineAnalysis?.byStage?.map(item => item.value) || [];
 
   const revenueChartOptions = {
     chart: {
@@ -219,8 +219,8 @@ function Reports() {
       curve: 'smooth',
       width: 3
     },
-    xaxis: {
-      categories: revenueMetrics.monthly.map(item => format(new Date(item.month), 'MMM yyyy')),
+xaxis: {
+      categories: revenueMetrics?.monthly?.map(item => format(new Date(item.month), 'MMM yyyy')) || [],
       labels: {
         style: {
           fontSize: '12px',
@@ -248,9 +248,9 @@ function Reports() {
     }
   };
 
-  const revenueChartSeries = [{
+const revenueChartSeries = [{
     name: 'Revenue',
-    data: revenueMetrics.monthly.map(item => item.revenue)
+    data: revenueMetrics?.monthly?.map(item => item.revenue) || []
   }];
 
   return (
